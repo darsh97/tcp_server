@@ -19,18 +19,18 @@
                 └── Return FD to user space
     
         2. bind() System Call
-        └── Kernel Entry
-            ├── Lookup FD in process table
-            ├── Validate address structure
-            │   ├── Check address family
-            │   └── Verify port availability
-            ├── Create sock address structure
-            │   ├── Convert IP address
-            │   └── Network byte ordering
-            ├── Update socket state
-            │   ├── Set bound flag
-            │   └── Associate address with socket
-            └── Return to user space
+            └── Kernel Entry
+                ├── Lookup FD in process table
+                ├── Validate address structure
+                │   ├── Check address family
+                │   └── Verify port availability
+                ├── Create sock address structure
+                │   ├── Convert IP address
+                │   └── Network byte ordering
+                ├── Update socket state
+                │   ├── Set bound flag
+                │   └── Associate address with socket
+                └── Return to user space
 
 2. Listen State Setup
     # USER SPACE
