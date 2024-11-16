@@ -1,40 +1,40 @@
 1. Socket Creation and Binding
 
     # USER SPACE
-    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_fd = server_socket.fileno()
+        server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        server_fd = server_socket.fileno()
 
     # KERNEL SPACE
 
-    1. socket() System Call
-    └── Kernel Entry
-        ├── Allocate socket structure (struct socket)
-        │   ├── Initialize protocol family (AF_INET)
-        │   └── Setup TCP protocol operations
-        ├── Create inode for socket
-        │   └── Associate with VFS (Virtual File System)
-        ├── Allocate file descriptor
-        │   ├── Find lowest available FD number
-        │   └── Create file structure
-        └── Return FD to user space
-
-    2. bind() System Call
-    └── Kernel Entry
-        ├── Lookup FD in process table
-        ├── Validate address structure
-        │   ├── Check address family
-        │   └── Verify port availability
-        ├── Create sock address structure
-        │   ├── Convert IP address
-        │   └── Network byte ordering
-        ├── Update socket state
-        │   ├── Set bound flag
-        │   └── Associate address with socket
-        └── Return to user space
+        1. socket() System Call
+            └── Kernel Entry
+                ├── Allocate socket structure (struct socket)
+                │   ├── Initialize protocol family (AF_INET)
+                │   └── Setup TCP protocol operations
+                ├── Create inode for socket
+                │   └── Associate with VFS (Virtual File System)
+                ├── Allocate file descriptor
+                │   ├── Find lowest available FD number
+                │   └── Create file structure
+                └── Return FD to user space
+    
+        2. bind() System Call
+        └── Kernel Entry
+            ├── Lookup FD in process table
+            ├── Validate address structure
+            │   ├── Check address family
+            │   └── Verify port availability
+            ├── Create sock address structure
+            │   ├── Convert IP address
+            │   └── Network byte ordering
+            ├── Update socket state
+            │   ├── Set bound flag
+            │   └── Associate address with socket
+            └── Return to user space
 
 2. Listen State Setup
     # USER SPACE
-    server_socket.listen(5)  # Backlog of 5
+        server_socket.listen(5)  # Backlog of 5
     
     # Kernel Space Operations:
         1. listen() System Call
@@ -67,8 +67,8 @@
 
 3. Accept Connection Process
     # USER SPACE
-    client_socket, addr = server_socket.accept()
-    client_fd = client_socket.fileno()
+        client_socket, addr = server_socket.accept()
+        client_fd = client_socket.fileno()
     
     # Kernel Space Operations:
         1. accept() System Call
