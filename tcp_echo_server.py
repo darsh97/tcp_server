@@ -18,6 +18,7 @@ from socket_config import ResuseAddressConfiguration
 # Constants
 HOST = 'localhost'
 PORT = 8080
+ALLOWED_CONNECTIONS = 2
 
 @contextmanager
 def create_server_socket(socket_factory: SocketFactory):
@@ -36,27 +37,22 @@ def manage_client_connection(client_socket):
         client_socket.close()
 
 def handle_client(client_socket, address):
-    with manage_client_connection(client_socket) as client_socket:
-        print(f'Connected by Client: {address}')
-        while True:    
-            try:
-                data = client_socket.recv(1024)
-
-                if not data:
-                    print(f'Client {address} disconnected')
-                    break
-                else:
-                    print(f'Echoing data from {address}: {data.decode()}')
-                    # Send the data back to the client
-                    client_socket.sendall(data)
-
-            except KeyboardInterrupt:
-                print(f"\nClosing connection to {address}")
+    while True:
+        try:
+            data = client_socket.recv(1024)
+            if not data:
+                print(f'Client {address} disconnected')
                 break
-
-            except Exception as e:
-                print(f"Socket Error with {address}: {e}")
-                break
+            else:
+                print(f'Echoing data from {address}: {data.decode()}')
+                # Send the data back to the client
+                client_socket.sendall(data)
+        except KeyboardInterrupt:
+            print(f"\nClosing connection to {address}")
+            break
+        except Exception as e:
+            print(f"Socket Error with {address}: {e}")
+            break
 
 def server():
     socket_factory = SocketFactory()
@@ -65,13 +61,20 @@ def server():
         print("Server Socket Created")
         server_socket.bind((HOST, PORT))
         print(f"Server Socket Bound to Address {HOST}:{PORT}")
-        server_socket.listen()
+        server_socket.listen(ALLOWED_CONNECTIONS)
         print("Server Listening")
         print(f'Server is running on {HOST}:{PORT}')
-        
-        client_socket, address = server_socket.accept()
-        handle_client(client_socket=client_socket, address=address)
-            
+
+        while True:
+            try:
+                client_connection, address = server_socket.accept()
+                handle_client(client_connection, address)
+            except KeyboardInterrupt:
+                print("\nShutting down server...")
+                break
+            except Exception as e:
+                print(f"Error accepting connection: {e}")
+                continue  # Continue accepting other connections
+
 if __name__ == "__main__":
     server()
-
